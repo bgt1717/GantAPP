@@ -1,34 +1,29 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const API = "http://localhost:5000";
 
-export default function Login() {
+export default function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // prevent default form submit
+    e.preventDefault();
 
-    try {
-      const res = await fetch(`${API}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+    const res = await fetch(`${API}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok && data.token) {
-        localStorage.setItem("token", data.token);
-        navigate("/projects"); // redirect after login
-      } else {
-        alert(data.message || "Login failed");
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      alert("An error occurred during login.");
+    if (res.ok && data.token) {
+      onLoginSuccess(data.token); // 🔥 THIS FIXES IT
+      navigate("/projects");
+    } else {
+      alert(data.message || "Login failed");
     }
   };
 
@@ -52,11 +47,9 @@ export default function Login() {
         />
         <button type="submit">Login</button>
       </form>
-      <p style={{ marginTop: "10px" }}>
-        Don't have an account?{" "}
-        <Link to="/register" style={{ color: "#2196f3", textDecoration: "underline" }}>
-          Register
-        </Link>
+
+      <p>
+        Don’t have an account? <Link to="/register">Register</Link>
       </p>
     </div>
   );
