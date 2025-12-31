@@ -61,7 +61,7 @@ function App() {
           path="/projects"
           element={
             <ProtectedRoute>
-              <Projects />
+              <Projects token={token} />
             </ProtectedRoute>
           }
         />

@@ -1,52 +1,45 @@
-import { useEffect, useState } from "react";
-import ProjectCard from "../components/ProjectCard";
+import { useState } from "react";
 
-const API = "http://localhost:5000";
-
-export default function Projects() {
-  const [projects, setProjects] = useState([]);
+function Projects({ token }) {
   const [name, setName] = useState("");
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    fetch(`${API}/projects`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.json())
-      .then(setProjects);
-  }, []);
 
   const addProject = async () => {
-    const res = await fetch(`${API}/projects`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ name }),
-    });
+    try {
+      const res = await fetch("http://localhost:5000/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // 🔥 REQUIRED
+        },
+        body: JSON.stringify({ name }),
+      });
 
-    const project = await res.json();
-    setProjects([...projects, project]);
-    setName("");
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to create project");
+      }
+
+      console.log("Project created:", data);
+      setName("");
+    } catch (err) {
+      console.error("Server error:", err.message);
+    }
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <h1>Projects</h1>
+    <div style={{ padding: "20px" }}>
+      <h2>Projects</h2>
 
-      <div style={{ marginBottom: 20 }}>
-        <input
-          placeholder="New project name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <button onClick={addProject}>Add Project</button>
-      </div>
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Project name"
+      />
 
-      {projects.map((p) => (
-        <ProjectCard key={p._id} project={p} />
-      ))}
+      <button onClick={addProject}>Add Project</button>
     </div>
   );
 }
+
+export default Projects;
