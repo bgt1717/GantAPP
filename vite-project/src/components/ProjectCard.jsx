@@ -13,12 +13,12 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
   return (
     <div
       style={{
-        border: "1px solid #ddd",
-        padding: "16px",
-        borderRadius: "10px",
-        marginBottom: "16px",
         background: "#fff",
-        color: "#222", // ✅ FIX
+        color: "#222",
+        border: "1px solid #ddd",
+        borderRadius: "10px",
+        padding: "16px",
+        marginBottom: "16px",
       }}
     >
       {editing ? (
@@ -26,37 +26,24 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "8px",
-              marginBottom: "8px",
-              color: "#222",
-            }}
+            style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
           />
 
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "8px",
-              marginBottom: "10px",
-              color: "#222",
-            }}
+            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
           />
 
           <div style={{ display: "flex", gap: "10px" }}>
-            <button>Save</button>
+            <button onClick={handleSave}>Save</button>
             <button onClick={() => setEditing(false)}>Cancel</button>
           </div>
         </>
       ) : (
         <>
-          <h3 style={{ marginBottom: "6px" }}>{project.name}</h3>
-
-          {project.description && (
-            <p style={{ color: "#555" }}>{project.description}</p>
-          )}
+          <h3>{project.name}</h3>
+          {project.description && <p>{project.description}</p>}
 
           <div style={{ display: "flex", gap: "10px" }}>
             <button onClick={() => setEditing(true)}>Edit</button>

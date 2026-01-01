@@ -3,16 +3,16 @@ import ProjectCard from "../components/ProjectCard";
 
 const API = "http://localhost:5000/api/projects";
 
-function Projects() {
+export default function Projects() {
   const [projects, setProjects] = useState([]);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newDescription, setNewDescription] = useState("");
 
   const token = localStorage.getItem("token");
 
-  /* ================= FETCH PROJECTS ================= */
+  /* ---------- FETCH PROJECTS ---------- */
   useEffect(() => {
     if (!token) return;
 
@@ -24,7 +24,7 @@ function Projects() {
           },
         });
 
-        if (!res.ok) throw new Error("Fetch failed");
+        if (!res.ok) throw new Error("Failed to fetch projects");
 
         const data = await res.json();
         setProjects(data);
@@ -39,9 +39,9 @@ function Projects() {
     fetchProjects();
   }, [token]);
 
-  /* ================= ADD PROJECT ================= */
+  /* ---------- ADD PROJECT ---------- */
   const addProject = async () => {
-    if (!name.trim()) return;
+    if (!newName.trim()) return;
 
     try {
       const res = await fetch(API, {
@@ -50,22 +50,48 @@ function Projects() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name, description }),
+        body: JSON.stringify({ name: newName, description: newDescription }),
       });
 
-      if (!res.ok) throw new Error("Create failed");
+      if (!res.ok) throw new Error("Failed to create project");
 
-      const newProject = await res.json();
-      setProjects((prev) => [newProject, ...prev]);
-      setName("");
-      setDescription("");
+      const createdProject = await res.json();
+      setProjects((prev) => [createdProject, ...prev]);
+
+      setNewName("");
+      setNewDescription("");
+      setError("");
     } catch (err) {
       console.error(err);
       setError("Failed to create project");
     }
   };
 
-  /* ================= DELETE PROJECT ================= */
+  /* ---------- UPDATE PROJECT ---------- */
+  const updateProject = async (id, updates) => {
+    try {
+      const res = await fetch(`${API}/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (!res.ok) throw new Error("Update failed");
+
+      const updatedProject = await res.json();
+      setProjects((prev) =>
+        prev.map((p) => (p._id === id ? updatedProject : p))
+      );
+    } catch (err) {
+      console.error(err);
+      setError("Failed to update project");
+    }
+  };
+
+  /* ---------- DELETE PROJECT ---------- */
   const deleteProject = async (id) => {
     try {
       const res = await fetch(`${API}/${id}`, {
@@ -84,14 +110,14 @@ function Projects() {
     }
   };
 
-  /* ================= UI ================= */
-  return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "20px" }}>
-      <h2>Your Projects</h2>
+  if (loading) return <p>Loading projects...</p>;
 
+  return (
+    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
+      <h2>Your Projects</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* ADD PROJECT */}
+      {/* ---------- ADD PROJECT UI ---------- */}
       <div
         style={{
           background: "#f5f5f5",
@@ -102,18 +128,16 @@ function Projects() {
       >
         <input
           placeholder="Project name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
           style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
         />
-
         <textarea
           placeholder="Description (optional)"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={newDescription}
+          onChange={(e) => setNewDescription(e.target.value)}
           style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
         />
-
         <button
           onClick={addProject}
           style={{
@@ -129,10 +153,8 @@ function Projects() {
         </button>
       </div>
 
-      {/* PROJECT LIST */}
-      {loading ? (
-        <p>Loading projects...</p>
-      ) : projects.length === 0 ? (
+      {/* ---------- PROJECT LIST ---------- */}
+      {projects.length === 0 ? (
         <p>No projects yet.</p>
       ) : (
         projects.map((project) => (
@@ -140,11 +162,10 @@ function Projects() {
             key={project._id}
             project={project}
             onDelete={deleteProject}
+            onUpdate={updateProject}
           />
         ))
       )}
     </div>
   );
 }
-
-export default Projects;
