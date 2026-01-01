@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ProjectCard from "../components/ProjectCard";
 
 const API = "http://localhost:5000/api/projects";
 
@@ -23,9 +24,7 @@ function Projects() {
           },
         });
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch projects");
-        }
+        if (!res.ok) throw new Error("Fetch failed");
 
         const data = await res.json();
         setProjects(data);
@@ -54,28 +53,40 @@ function Projects() {
         body: JSON.stringify({ name, description }),
       });
 
-      if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg);
-      }
+      if (!res.ok) throw new Error("Create failed");
 
       const newProject = await res.json();
-
-      // ✅ SAFE STATE UPDATE
       setProjects((prev) => [newProject, ...prev]);
-
       setName("");
       setDescription("");
-      setError("");
     } catch (err) {
       console.error(err);
       setError("Failed to create project");
     }
   };
 
+  /* ================= DELETE PROJECT ================= */
+  const deleteProject = async (id) => {
+    try {
+      const res = await fetch(`${API}/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Delete failed");
+
+      setProjects((prev) => prev.filter((p) => p._id !== id));
+    } catch (err) {
+      console.error(err);
+      setError("Failed to delete project");
+    }
+  };
+
   /* ================= UI ================= */
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
+    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "20px" }}>
       <h2>Your Projects</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -125,20 +136,11 @@ function Projects() {
         <p>No projects yet.</p>
       ) : (
         projects.map((project) => (
-          <div
+          <ProjectCard
             key={project._id}
-            style={{
-              border: "1px solid #ddd",
-              padding: "15px",
-              borderRadius: "8px",
-              marginBottom: "12px",
-            }}
-          >
-            <h3 style={{ margin: 0 }}>{project.name}</h3>
-            {project.description && (
-              <p style={{ color: "#555" }}>{project.description}</p>
-            )}
-          </div>
+            project={project}
+            onDelete={deleteProject}
+          />
         ))
       )}
     </div>
