@@ -1,49 +1,66 @@
 import Project from "../models/Project.js";
 
-// Get all projects for logged-in user
+/* =========================
+   GET PROJECTS
+========================= */
 export const getProjects = async (req, res) => {
   try {
-    const projects = await Project.find({ user: req.user._id }).sort({ createdAt: -1 });
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    const projects = await Project.find({
+      user: req.user._id,
+    }).sort({ createdAt: -1 });
+
     res.json(projects);
   } catch (err) {
-    console.error(err);
+    console.error("GET PROJECTS ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Create a new project
+/* =========================
+   CREATE PROJECT
+========================= */
 export const createProject = async (req, res) => {
   try {
-    if (!req.user) {
+    if (!req.user || !req.user._id) {
       return res.status(401).json({ message: "User not authenticated" });
     }
 
     const { name, description } = req.body;
-    if (!name) {
+
+    if (!name || name.trim() === "") {
       return res.status(400).json({ message: "Project name is required" });
     }
 
-    const project = new Project({
-      name,
+    const project = await Project.create({
+      name: name.trim(),
       description: description || "",
       user: req.user._id,
     });
 
-    await project.save();
     res.status(201).json(project);
   } catch (err) {
-    console.error(err);
+    console.error("CREATE PROJECT ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Update project
+/* =========================
+   UPDATE PROJECT
+========================= */
 export const updateProject = async (req, res) => {
   try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     const project = await Project.findOneAndUpdate(
       { _id: req.params.id, user: req.user._id },
       req.body,
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!project) {
@@ -52,14 +69,20 @@ export const updateProject = async (req, res) => {
 
     res.json(project);
   } catch (err) {
-    console.error(err);
+    console.error("UPDATE PROJECT ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Delete project
+/* =========================
+   DELETE PROJECT
+========================= */
 export const deleteProject = async (req, res) => {
   try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     const project = await Project.findOneAndDelete({
       _id: req.params.id,
       user: req.user._id,
@@ -71,7 +94,7 @@ export const deleteProject = async (req, res) => {
 
     res.json({ message: "Project deleted" });
   } catch (err) {
-    console.error(err);
+    console.error("DELETE PROJECT ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
