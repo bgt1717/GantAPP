@@ -12,6 +12,7 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
 
   // ---------- Task management ----------
   const [tasks, setTasks] = useState([]);
+  const [showAddTask, setShowAddTask] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -45,6 +46,7 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
       setEditing(false);
     } catch (err) {
       console.error("Failed to update project", err);
+      alert("Update failed");
     }
   };
 
@@ -59,11 +61,7 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          name: taskName,
-          startDate,
-          endDate,
-        }),
+        body: JSON.stringify({ name: taskName, startDate, endDate }),
       });
 
       if (!res.ok) {
@@ -74,10 +72,11 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
       const newTask = await res.json();
       setTasks((prev) => [...prev, newTask]);
 
-      // Reset form
+      // Reset form and hide
       setTaskName("");
       setStartDate("");
       setEndDate("");
+      setShowAddTask(false);
     } catch (err) {
       console.error(err);
       alert(err.message);
@@ -100,7 +99,7 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
   };
 
   return (
-    <div style={{ border: "1px solid #ddd", padding: "16px", borderRadius: "8px", marginBottom: "12px", background: "#fff" }}>
+    <div style={{ border: "1px solid #ddd", color: "black", padding: "16px", borderRadius: "8px", marginBottom: "12px", background: "#fff" }}>
       {/* ---------- Project section ---------- */}
       {editing ? (
         <>
@@ -122,34 +121,41 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
           <h3>{project.name}</h3>
           {project.description && <p>{project.description}</p>}
           <button onClick={() => setEditing(true)} style={{ marginRight: "8px" }}>Edit</button>
-          <button onClick={() => onDelete(project._id)}>Delete</button>
+          <button onClick={() => onDelete(project._id)} style={{ marginRight: "8px" }}>Delete</button>
+          <button
+            onClick={() => setShowAddTask(!showAddTask)}
+            style={{ background: "#8bc34a", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "6px", cursor: "pointer" }}
+          >
+            Add Task
+          </button>
         </>
       )}
 
-      {/* ---------- Add task form ---------- */}
-      <div style={{ marginTop: "16px", background: "black", padding: "12px", borderRadius: "6px" }}>
-        <h4>Add Task</h4>
-        <input
-          type="text"
-          placeholder="Task name"
-          value={taskName}
-          onChange={(e) => setTaskName(e.target.value)}
-          style={{ width: "100%", padding: "6px", marginBottom: "6px" }}
-        />
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          style={{ width: "48%", padding: "6px", marginRight: "4%" }}
-        />
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          style={{ width: "48%", padding: "6px" }}
-        />
-        <button onClick={addTask} style={{ marginTop: "6px", background: "#1976d2", color: "#fff", border: "none", padding: "8px 14px", borderRadius: "6px", cursor: "pointer" }}>+ Add Task</button>
-      </div>
+      {/* ---------- Toggleable Add Task form ---------- */}
+      {showAddTask && (
+        <div style={{ marginTop: "12px", background: "black", padding: "12px", borderRadius: "6px" }}>
+          <input
+            type="text"
+            placeholder="Task name"
+            value={taskName}
+            onChange={(e) => setTaskName(e.target.value)}
+            style={{ width: "100%", padding: "6px", marginBottom: "6px" }}
+          />
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            style={{ width: "48%", padding: "6px", marginRight: "4%" }}
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            style={{ width: "48%", padding: "6px" }}
+          />
+          <button onClick={addTask} style={{ marginTop: "6px", background: "#1976d2", color: "#fff", border: "none", padding: "8px 14px", borderRadius: "6px", cursor: "pointer" }}>+ Add Task</button>
+        </div>
+      )}
 
       {/* ---------- Task list ---------- */}
       {tasks.length > 0 && (

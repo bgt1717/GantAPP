@@ -68,28 +68,24 @@ export default function Projects() {
   };
 
   /* ---------- UPDATE PROJECT ---------- */
-  const updateProject = async (id, updates) => {
-    try {
-      const res = await fetch(`${API}/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updates),
-      });
+const updateProject = async (updatedProject) => {
+  try {
+    const res = await fetch(`${API}/${updatedProject._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ name: updatedProject.name, description: updatedProject.description }),
+    });
 
-      if (!res.ok) throw new Error("Update failed");
+    if (!res.ok) throw new Error("Update failed");
 
-      const updatedProject = await res.json();
-      setProjects((prev) =>
-        prev.map((p) => (p._id === id ? updatedProject : p))
-      );
-    } catch (err) {
-      console.error(err);
-      setError("Failed to update project");
-    }
-  };
+    const updated = await res.json();
+    setProjects((prev) => prev.map((p) => (p._id === updated._id ? updated : p)));
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+};
+
 
   /* ---------- DELETE PROJECT ---------- */
   const deleteProject = async (id) => {
