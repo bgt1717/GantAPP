@@ -12,7 +12,7 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description || "");
 
-  /* ---------- Task state ---------- */
+  /* ---------- Tasks state ---------- */
   const [tasks, setTasks] = useState([]);
   const [showAddTask, setShowAddTask] = useState(false);
   const [showTasks, setShowTasks] = useState(false);
@@ -50,7 +50,6 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
       },
       body: JSON.stringify({ name, description }),
     });
-
     const updated = await res.json();
     onUpdate(updated);
     setEditing(false);
@@ -71,7 +70,6 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
 
     const newTask = await res.json();
     setTasks((prev) => [...prev, newTask]);
-
     setTaskName("");
     setStartDate("");
     setEndDate("");
@@ -140,27 +138,38 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
         <>
           <h3>{project.name}</h3>
           {project.description && <p>{project.description}</p>}
+        </>
+      )}
 
-          <div className="project-actions">
-            <button onClick={() => setEditing(true)}>Edit</button>
-            <button onClick={() => onDelete(project._id)}>Delete</button>
-            <button
-              className="btn-add"
-              onClick={() => setShowAddTask(!showAddTask)}
-            >
-              Add Task
-            </button>
+      {/* ---------- Gantt chart ---------- */}
+      {tasks.length > 0 && <GanttChart tasks={tasks} />}
+
+      {/* ---------- Buttons section ---------- */}
+      <div className="project-actions">
+        {/* Add Task always visible */}
+        <button
+          className="btn-add"
+          onClick={() => setShowAddTask(!showAddTask)}
+        >
+          Add Task
+        </button>
+
+        {/* Only show these if tasks exist */}
+        {tasks.length > 0 && (
+          <>
+            <button onClick={() => setEditing(true)}>Edit Project</button>
+            <button onClick={() => onDelete(project._id)}>Delete Project</button>
             <button
               className="btn-tasks"
               onClick={() => setShowTasks(!showTasks)}
             >
               Tasks
             </button>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
 
-      {/* ---------- Add Task ---------- */}
+      {/* ---------- Add Task Form ---------- */}
       {showAddTask && (
         <div className="task-form">
           <input
@@ -168,17 +177,22 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
           />
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
           <button onClick={addTask}>Add</button>
         </div>
       )}
 
-      {/* ---------- Gantt ---------- */}
-      {tasks.length > 0 && <GanttChart tasks={tasks} />}
-
-      {/* ---------- Task List + Edit ---------- */}
-      {showTasks && (
+      {/* ---------- Task List ---------- */}
+      {showTasks && tasks.length > 0 && (
         <div className="task-list">
           {tasks.map((task) => (
             <div key={task._id} className="task-row">
