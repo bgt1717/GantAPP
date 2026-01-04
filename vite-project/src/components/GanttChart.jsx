@@ -1,59 +1,44 @@
-import { getISOWeek } from "../utils/dateUtils";
+import { getWeekNumber } from "../utils/dateUtils";
 import "./GanttChart.css";
 
 export default function GanttChart({ tasks }) {
   return (
-    <div className="gantt-container">
-      <h4>Gantt Chart (Weeks 1–52)</h4>
-
-      <div className="gantt-header">
-        {/* Task Names */}
-        <div className="gantt-task-names">
-          <div className="header">Task</div>
-          {tasks.map((task) => (
-            <div key={task._id} className="task-row" title={task.name}>
-              {task.name}
+    <div className="gantt-wrapper">
+      <div className="gantt-scroll">
+        {/* ---------- Header ---------- */}
+        <div className="gantt-header">
+          <div className="gantt-task-col">Task</div>
+          {Array.from({ length: 52 }, (_, i) => (
+            <div key={i} className="gantt-week">
+              {i + 1}
             </div>
           ))}
         </div>
 
-        {/* Scrollable Grid */}
-        <div className="gantt-grid-scroll">
-          <div style={{ width: 32 * 52 }}>
-            {/* Week Header */}
-            <div className="gantt-grid-header">
-              {Array.from({ length: 52 }, (_, i) => (
-                <div key={i} className="gantt-week">
-                  {i + 1}
-                </div>
-              ))}
+        {/* ---------- Rows ---------- */}
+        {tasks.map((task) => {
+          const startWeek = getWeekNumber(task.startDate);
+          const endWeek = getWeekNumber(task.endDate);
+          const span =
+            startWeek && endWeek ? endWeek - startWeek + 1 : 0;
+
+          return (
+            <div key={task._id} className="gantt-row">
+              <div className="gantt-task-name">{task.name}</div>
+
+              <div className="gantt-grid">
+                {startWeek && endWeek && (
+                  <div
+                    className="gantt-bar"
+                    style={{
+                      gridColumn: `${startWeek} / span ${span}`,
+                    }}
+                  />
+                )}
+              </div>
             </div>
-
-            {/* Task Rows */}
-            {tasks.map((task) => {
-              const startWeek = task.startDate ? getISOWeek(task.startDate) : null;
-              const endWeek = task.endDate ? getISOWeek(task.endDate) : null;
-
-              return (
-                <div key={task._id} className="gantt-grid-row">
-                  {Array.from({ length: 52 }).map((_, i) => (
-                    <div key={i} className="gantt-grid-cell" />
-                  ))}
-
-                  {startWeek && endWeek && (
-                    <div
-                      className="gantt-task-bar"
-                      style={{
-                        left: (startWeek - 1) * 32,
-                        width: (endWeek - startWeek + 1) * 32,
-                      }}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+          );
+        })}
       </div>
     </div>
   );
