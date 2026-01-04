@@ -1,0 +1,95 @@
+/* Container */
+.gantt-container {
+  margin-top: 24px;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+.gantt-header {
+  display: flex;
+  border: 1px solid #ddd;
+}
+
+/* Task name column */
+.gantt-task-names {
+  width: 180px;
+  background: #fafafa;
+}
+
+/* Task name header */
+.gantt-task-names .header {
+  height: 28px;
+  padding: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+/* Task name rows */
+.gantt-task-names .task-row {
+  height: 32px;
+  padding: 6px;
+  font-size: 12px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+/* Scrollable Gantt grid */
+.gantt-grid-scroll {
+  overflow-x: auto;
+}
+
+/* Week header */
+.gantt-grid-header {
+  display: grid;
+  grid-template-columns: repeat(52, 32px);
+  height: 28px;
+  border-bottom: 1px solid #ddd;
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+/* Week cells */
+.gantt-week {
+  border-right: 1px solid #e0e0e0;
+  font-size: 10px;
+  text-align: center;
+  line-height: 28px;
+  color: #555;
+  box-sizing: border-box;
+}
+
+/* Task row in grid */
+.gantt-grid-row {
+  display: grid;
+  grid-template-columns: repeat(52, 32px);
+  height: 32px;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Grid cell inside row (for vertical lines) */
+.gantt-grid-cell {
+  border-right: 1px solid #f0f0f0;
+  box-sizing: border-box;
+}
+
+/* Task bar */
+.gantt-task-bar {
+  position: absolute;
+  height: 18px;
+  top: 7px;
+  background: #ff6f00;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Optional hover effect */
+.gantt-grid-row:hover .gantt-task-bar {
+  opacity: 0.85;
+}
