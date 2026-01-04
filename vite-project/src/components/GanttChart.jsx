@@ -1,67 +1,138 @@
 import { getISOWeek } from "../utils/dateUtils";
 
-export default function GanttChart({ tasks }) {
-  const WEEK_WIDTH = 30;
-  const TOTAL_WEEKS = 52;
+const WEEK_WIDTH = 32;
+const TOTAL_WEEKS = 52;
+const ROW_HEIGHT = 32;
+const NAME_COL_WIDTH = 180;
+const HEADER_HEIGHT = 28;
 
+const rowStyle = {
+  height: ROW_HEIGHT,
+  boxSizing: "border-box",
+  borderBottom: "1px solid #eee",
+};
+
+export default function GanttChart({ tasks }) {
   return (
-    <div style={{ marginTop: "20px", overflowX: "auto" }}>
+    <div style={{ marginTop: "24px" }}>
       <h4>Gantt Chart (Weeks 1–52)</h4>
 
-      {/* ---------- Week Header ---------- */}
-      <div style={{ display: "flex", marginBottom: "8px" }}>
-        {Array.from({ length: TOTAL_WEEKS }, (_, i) => (
+      <div style={{ display: "flex", border: "1px solid #ddd" }}>
+        {/* ---------- Task Names (Fixed) ---------- */}
+        <div style={{ width: NAME_COL_WIDTH, background: "#fafafa" }}>
+          {/* Header */}
           <div
-            key={i}
             style={{
-              width: WEEK_WIDTH,
-              fontSize: "10px",
-              textAlign: "center",
-              borderRight: "1px solid #ddd",
-              color: "#555",
+              height: HEADER_HEIGHT,
+              boxSizing: "border-box",
+              padding: "6px",
+              fontSize: "11px",
+              fontWeight: "bold",
+              borderBottom: "1px solid #ddd",
             }}
           >
-            {i + 1}
+            Task
           </div>
-        ))}
-      </div>
 
-      {/* ---------- Task Rows ---------- */}
-      {tasks.map((task) => {
-        if (!task.startDate || !task.endDate) return null;
-
-        const startWeek = getISOWeek(task.startDate);
-        const endWeek = getISOWeek(task.endDate);
-
-        return (
-          <div key={task._id} style={{ marginBottom: "12px" }}>
-            <div style={{ fontSize: "12px", marginBottom: "4px" }}>
+          {tasks.map((task) => (
+            <div
+              key={task._id}
+              style={{
+                ...rowStyle,
+                padding: "6px",
+                fontSize: "12px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+              title={task.name}
+            >
               {task.name}
             </div>
+          ))}
+        </div>
 
+        {/* ---------- Single Scroll Area ---------- */}
+        <div style={{ overflowX: "auto" }}>
+          <div style={{ width: WEEK_WIDTH * TOTAL_WEEKS }}>
+            {/* ---------- Week Header ---------- */}
             <div
               style={{
-                position: "relative",
-                height: "20px",
-                width: WEEK_WIDTH * TOTAL_WEEKS,
-                background: "#f5f5f5",
-                borderRadius: "4px",
+                display: "grid",
+                gridTemplateColumns: `repeat(${TOTAL_WEEKS}, ${WEEK_WIDTH}px)`,
+                height: HEADER_HEIGHT,
+                boxSizing: "border-box",
+                borderBottom: "1px solid #ddd",
+                background: "#fafafa",
               }}
             >
-              <div
-                style={{
-                  position: "absolute",
-                  left: (startWeek - 1) * WEEK_WIDTH,
-                  width: (endWeek - startWeek + 1) * WEEK_WIDTH,
-                  height: "100%",
-                  background: "#1976d2",
-                  borderRadius: "4px",
-                }}
-              />
+              {Array.from({ length: TOTAL_WEEKS }, (_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    borderRight: "1px solid #e0e0e0",
+                    fontSize: "10px",
+                    textAlign: "center",
+                    lineHeight: `${HEADER_HEIGHT}px`,
+                    boxSizing: "border-box",
+                    color: "#555",
+                  }}
+                >
+                  {i + 1}
+                </div>
+              ))}
             </div>
+
+            {/* ---------- Task Rows ---------- */}
+            {tasks.map((task) => {
+              const startWeek = task.startDate
+                ? getISOWeek(task.startDate)
+                : null;
+              const endWeek = task.endDate
+                ? getISOWeek(task.endDate)
+                : null;
+
+              return (
+                <div
+                  key={task._id}
+                  style={{
+                    ...rowStyle,
+                    position: "relative",
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${TOTAL_WEEKS}, ${WEEK_WIDTH}px)`,
+                  }}
+                >
+                  {/* Grid cells */}
+                  {Array.from({ length: TOTAL_WEEKS }).map((_, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        borderRight: "1px solid #f0f0f0",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  ))}
+
+                  {/* Task bar */}
+                  {startWeek && endWeek && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: (startWeek - 1) * WEEK_WIDTH,
+                        width: (endWeek - startWeek + 1) * WEEK_WIDTH,
+                        height: "18px",
+                        top: "7px",
+                        background: "#1976d2",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
+        </div>
+      </div>
     </div>
   );
 }
