@@ -7,19 +7,19 @@ const API_PROJECTS = "http://localhost:5000/api/projects";
 export default function ProjectCard({ project, onDelete, onUpdate }) {
   const token = localStorage.getItem("token");
 
-  // ---------- Project edit ----------
+  /* ---------- Project edit ---------- */
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description || "");
 
-  // ---------- Task management ----------
+  /* ---------- Tasks ---------- */
   const [tasks, setTasks] = useState([]);
   const [showAddTask, setShowAddTask] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Fetch tasks on mount
+  /* ---------- Fetch tasks ---------- */
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -29,13 +29,13 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
         const data = await res.json();
         setTasks(data);
       } catch (err) {
-        console.error("Failed to load tasks", err);
+        console.error(err);
       }
     };
     fetchTasks();
   }, [project._id, token]);
 
-  // ---------- Save project edits ----------
+  /* ---------- Save project ---------- */
   const saveProject = async () => {
     try {
       const res = await fetch(`${API_PROJECTS}/${project._id}`, {
@@ -46,13 +46,12 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
       const updated = await res.json();
       onUpdate(updated);
       setEditing(false);
-    } catch (err) {
-      console.error("Failed to update project", err);
+    } catch {
       alert("Update failed");
     }
   };
 
-  // ---------- Add task ----------
+  /* ---------- Add task ---------- */
   const addTask = async () => {
     if (!taskName.trim()) return;
     try {
@@ -61,37 +60,38 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ name: taskName, startDate, endDate }),
       });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Failed to add task");
-      }
       const newTask = await res.json();
       setTasks((prev) => [...prev, newTask]);
-      setTaskName(""); setStartDate(""); setEndDate(""); setShowAddTask(false);
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
+      setTaskName("");
+      setStartDate("");
+      setEndDate("");
+      setShowAddTask(false);
+    } catch {
+      alert("Failed to add task");
     }
   };
 
-  // ---------- Delete task ----------
+  /* ---------- Delete task ---------- */
   const deleteTask = async (taskId) => {
     try {
-      const res = await fetch(`${API_PROJECTS}/${project._id}/tasks/${taskId}`, {
+      await fetch(`${API_PROJECTS}/${project._id}/tasks/${taskId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Failed to delete task");
       setTasks((prev) => prev.filter((t) => t._id !== taskId));
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
+    } catch {
+      alert("Failed to delete task");
     }
+  };
+
+  /* ---------- Update task ---------- */
+  const updateTask = (updatedTask) => {
+    setTasks((prev) => prev.map((t) => (t._id === updatedTask._id ? updatedTask : t)));
   };
 
   return (
     <div className="project-card">
-      {/* ---------- Project Section ---------- */}
+      {/* ---------- Project header ---------- */}
       {editing ? (
         <>
           <input value={name} onChange={(e) => setName(e.target.value)} />
@@ -105,21 +105,30 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
           {project.description && <p>{project.description}</p>}
           <button className="edit-btn" onClick={() => setEditing(true)}>Edit</button>
           <button className="delete-btn" onClick={() => onDelete(project._id)}>Delete</button>
-          <button className="add-task-toggle" onClick={() => setShowAddTask(!showAddTask)}>Add Task</button>
+          <button className="add-task-toggle" onClick={() => setShowAddTask(!showAddTask)}>
+            Add Task
+          </button>
         </>
       )}
 
-      {/* ---------- Add Task Form ---------- */}
+      {/* ---------- Add task form ---------- */}
       {showAddTask && (
         <div className="add-task-form">
-          <input type="text" placeholder="Task name" value={taskName} onChange={(e) => setTaskName(e.target.value)} />
+          <input placeholder="Task name" value={taskName} onChange={(e) => setTaskName(e.target.value)} />
           <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
           <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
           <button onClick={addTask}>+ Add Task</button>
         </div>
       )}
 
-      {/* ---------- Task List ---------- */}
+      {/* ---------- GANTT CHART (comes FIRST) ---------- */}
+      {tasks.length > 0 && (
+        <div className="gantt-wrapper">
+          <GanttChart tasks={tasks} />
+        </div>
+      )}
+
+      {/* ---------- TASK LIST (comes AFTER gantt) ---------- */}
       {tasks.length > 0 && (
         <div className="task-list">
           {tasks.map((task) => (
@@ -128,58 +137,54 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
               task={task}
               projectId={project._id}
               token={token}
-              deleteTask={deleteTask}
-              updateTask={(updatedTask) => setTasks((prev) => prev.map((t) => (t._id === updatedTask._id ? updatedTask : t)))}
+              onDelete={deleteTask}
+              onUpdate={updateTask}
             />
           ))}
-          <GanttChart tasks={tasks} />
         </div>
       )}
     </div>
   );
 }
 
-// ---------- TaskItem Component ----------
-function TaskItem({ task, projectId, token, deleteTask, updateTask }) {
-  const [editingTask, setEditingTask] = useState(false);
-  const [editName, setEditName] = useState(task.name);
-  const [editStart, setEditStart] = useState(task.startDate || "");
-  const [editEnd, setEditEnd] = useState(task.endDate || "");
+/* ---------- TaskItem ---------- */
+function TaskItem({ task, projectId, token, onDelete, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(task.name);
+  const [startDate, setStartDate] = useState(task.startDate || "");
+  const [endDate, setEndDate] = useState(task.endDate || "");
 
-  const saveTask = async () => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/projects/${projectId}/tasks/${task._id}`, {
+  const save = async () => {
+    const res = await fetch(
+      `http://localhost:5000/api/projects/${projectId}/tasks/${task._id}`,
+      {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name: editName, startDate: editStart, endDate: editEnd }),
-      });
-      if (!res.ok) throw new Error("Failed to update task");
-      const updated = await res.json();
-      updateTask(updated);
-      setEditingTask(false);
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
-    }
+        body: JSON.stringify({ name, startDate, endDate }),
+      }
+    );
+    const updated = await res.json();
+    onUpdate(updated);
+    setEditing(false);
   };
 
   return (
     <div className="task-item">
-      {!editingTask ? (
+      {!editing ? (
         <>
-          <span>{task.name} ({task.startDate ? new Date(task.startDate).toLocaleDateString() : "-"} → {task.endDate ? new Date(task.endDate).toLocaleDateString() : "-"})</span>
+          <span>{task.name}</span>
           <div>
-            <button className="edit-btn" onClick={() => setEditingTask(true)}>Edit</button>
-            <button className="delete-btn" onClick={() => deleteTask(task._id)}>Delete</button>
+            <button className="edit-btn" onClick={() => setEditing(true)}>Edit</button>
+            <button className="delete-btn" onClick={() => onDelete(task._id)}>Delete</button>
           </div>
         </>
       ) : (
         <div className="task-edit-form">
-          <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
-          <input type="date" value={editStart} onChange={(e) => setEditStart(e.target.value)} />
-          <input type="date" value={editEnd} onChange={(e) => setEditEnd(e.target.value)} />
-          <button className="save-btn" onClick={saveTask}>Save</button>
-          <button className="cancel-btn" onClick={() => setEditingTask(false)}>Cancel</button>
+          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          <button className="save-btn" onClick={save}>Save</button>
+          <button className="cancel-btn" onClick={() => setEditing(false)}>Cancel</button>
         </div>
       )}
     </div>
