@@ -8,17 +8,23 @@ export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // ---------- Toggle Add Project ----------
+  const [showAddProject, setShowAddProject] = useState(false);
   const [newName, setNewName] = useState("");
   const [newDescription, setNewDescription] = useState("");
 
   const token = localStorage.getItem("token");
 
+  /* ---------- FETCH PROJECTS ---------- */
   useEffect(() => {
     if (!token) return;
 
     const fetchProjects = async () => {
       try {
-        const res = await fetch(API, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(API, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!res.ok) throw new Error("Failed to fetch projects");
         const data = await res.json();
         setProjects(data);
@@ -33,19 +39,28 @@ export default function Projects() {
     fetchProjects();
   }, [token]);
 
+  /* ---------- ADD PROJECT ---------- */
   const addProject = async () => {
     if (!newName.trim()) return;
+
     try {
       const res = await fetch(API, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ name: newName, description: newDescription }),
       });
+
       if (!res.ok) throw new Error("Failed to create project");
+
       const createdProject = await res.json();
       setProjects((prev) => [createdProject, ...prev]);
+
       setNewName("");
       setNewDescription("");
+      setShowAddProject(false);
       setError("");
     } catch (err) {
       console.error(err);
@@ -53,25 +68,38 @@ export default function Projects() {
     }
   };
 
+  /* ---------- UPDATE PROJECT ---------- */
   const updateProject = async (updatedProject) => {
     try {
       const res = await fetch(`${API}/${updatedProject._id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name: updatedProject.name, description: updatedProject.description }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: updatedProject.name,
+          description: updatedProject.description,
+        }),
       });
       if (!res.ok) throw new Error("Update failed");
       const updated = await res.json();
-      setProjects((prev) => prev.map((p) => (p._id === updated._id ? updated : p)));
+      setProjects((prev) =>
+        prev.map((p) => (p._id === updated._id ? updated : p))
+      );
     } catch (err) {
       console.error(err);
       alert(err.message);
     }
   };
 
+  /* ---------- DELETE PROJECT ---------- */
   const deleteProject = async (id) => {
     try {
-      const res = await fetch(`${API}/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API}/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!res.ok) throw new Error("Delete failed");
       setProjects((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
@@ -87,22 +115,31 @@ export default function Projects() {
       <h2>Your Projects</h2>
       {error && <p className="error">{error}</p>}
 
-      {/* Add Project Form */}
-      <div className="add-project-form">
-        <input
-          placeholder="Project name"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-        />
-        <textarea
-          placeholder="Description (optional)"
-          value={newDescription}
-          onChange={(e) => setNewDescription(e.target.value)}
-        />
-        <button onClick={addProject}>+ Add Project</button>
-      </div>
+      {/* ---------- Toggle Add Project ---------- */}
+      <button
+        className="btn-add-project"
+        onClick={() => setShowAddProject(!showAddProject)}
+      >
+        + Add Project
+      </button>
 
-      {/* Project List */}
+      {showAddProject && (
+        <div className="add-project-form">
+          <input
+            placeholder="Project name"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <textarea
+            placeholder="Description (optional)"
+            value={newDescription}
+            onChange={(e) => setNewDescription(e.target.value)}
+          />
+          <button onClick={addProject}>Add</button>
+        </div>
+      )}
+
+      {/* ---------- Project list ---------- */}
       {projects.length === 0 ? (
         <p>No projects yet.</p>
       ) : (
