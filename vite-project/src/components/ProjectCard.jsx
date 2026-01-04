@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import GanttChart from "./GanttChart";
 import "./ProjectCard.css";
 
@@ -12,81 +12,115 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description || "");
 
-  /* ---------- Tasks ---------- */
+  /* ---------- Task state ---------- */
   const [tasks, setTasks] = useState([]);
   const [showAddTask, setShowAddTask] = useState(false);
+  const [showTasks, setShowTasks] = useState(false);
+
+  /* ---------- Add task form ---------- */
   const [taskName, setTaskName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  /* ---------- Editing task ---------- */
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editTaskName, setEditTaskName] = useState("");
+  const [editStartDate, setEditStartDate] = useState("");
+  const [editEndDate, setEditEndDate] = useState("");
+
   /* ---------- Fetch tasks ---------- */
   useEffect(() => {
     const fetchTasks = async () => {
-      try {
-        const res = await fetch(`${API_PROJECTS}/${project._id}/tasks`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        setTasks(data);
-      } catch (err) {
-        console.error(err);
-      }
+      const res = await fetch(`${API_PROJECTS}/${project._id}/tasks`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setTasks(data);
     };
     fetchTasks();
   }, [project._id, token]);
 
   /* ---------- Save project ---------- */
   const saveProject = async () => {
-    try {
-      const res = await fetch(`${API_PROJECTS}/${project._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name, description }),
-      });
-      const updated = await res.json();
-      onUpdate(updated);
-      setEditing(false);
-    } catch {
-      alert("Update failed");
-    }
+    const res = await fetch(`${API_PROJECTS}/${project._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name, description }),
+    });
+
+    const updated = await res.json();
+    onUpdate(updated);
+    setEditing(false);
   };
 
   /* ---------- Add task ---------- */
   const addTask = async () => {
     if (!taskName.trim()) return;
-    try {
-      const res = await fetch(`${API_PROJECTS}/${project._id}/tasks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name: taskName, startDate, endDate }),
-      });
-      const newTask = await res.json();
-      setTasks((prev) => [...prev, newTask]);
-      setTaskName("");
-      setStartDate("");
-      setEndDate("");
-      setShowAddTask(false);
-    } catch {
-      alert("Failed to add task");
-    }
+
+    const res = await fetch(`${API_PROJECTS}/${project._id}/tasks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name: taskName, startDate, endDate }),
+    });
+
+    const newTask = await res.json();
+    setTasks((prev) => [...prev, newTask]);
+
+    setTaskName("");
+    setStartDate("");
+    setEndDate("");
+    setShowAddTask(false);
+  };
+
+  /* ---------- Start editing task ---------- */
+  const startEditTask = (task) => {
+    setEditingTaskId(task._id);
+    setEditTaskName(task.name);
+    setEditStartDate(task.startDate?.slice(0, 10) || "");
+    setEditEndDate(task.endDate?.slice(0, 10) || "");
+  };
+
+  /* ---------- Save task edits ---------- */
+  const saveTask = async (taskId) => {
+    const res = await fetch(
+      `${API_PROJECTS}/${project._id}/tasks/${taskId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: editTaskName,
+          startDate: editStartDate,
+          endDate: editEndDate,
+        }),
+      }
+    );
+
+    const updatedTask = await res.json();
+
+    setTasks((prev) =>
+      prev.map((t) => (t._id === taskId ? updatedTask : t))
+    );
+
+    setEditingTaskId(null);
   };
 
   /* ---------- Delete task ---------- */
   const deleteTask = async (taskId) => {
-    try {
-      await fetch(`${API_PROJECTS}/${project._id}/tasks/${taskId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setTasks((prev) => prev.filter((t) => t._id !== taskId));
-    } catch {
-      alert("Failed to delete task");
-    }
-  };
+    await fetch(`${API_PROJECTS}/${project._id}/tasks/${taskId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  /* ---------- Update task ---------- */
-  const updateTask = (updatedTask) => {
-    setTasks((prev) => prev.map((t) => (t._id === updatedTask._id ? updatedTask : t)));
+    setTasks((prev) => prev.filter((t) => t._id !== taskId));
   };
 
   return (
@@ -95,96 +129,88 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
       {editing ? (
         <>
           <input value={name} onChange={(e) => setName(e.target.value)} />
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-          <button className="edit-btn" onClick={saveProject}>Save</button>
-          <button className="cancel-btn" onClick={() => setEditing(false)}>Cancel</button>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <button onClick={saveProject}>Save</button>
+          <button onClick={() => setEditing(false)}>Cancel</button>
         </>
       ) : (
         <>
           <h3>{project.name}</h3>
           {project.description && <p>{project.description}</p>}
-          <button className="edit-btn" onClick={() => setEditing(true)}>Edit</button>
-          <button className="delete-btn" onClick={() => onDelete(project._id)}>Delete</button>
-          <button className="add-task-toggle" onClick={() => setShowAddTask(!showAddTask)}>
-            Add Task
-          </button>
-        </>
-      )}
 
-      {/* ---------- Add task form ---------- */}
-      {showAddTask && (
-        <div className="add-task-form">
-          <input placeholder="Task name" value={taskName} onChange={(e) => setTaskName(e.target.value)} />
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-          <button onClick={addTask}>+ Add Task</button>
-        </div>
-      )}
-
-      {/* ---------- GANTT CHART (comes FIRST) ---------- */}
-      {tasks.length > 0 && (
-        <div className="gantt-wrapper">
-          <GanttChart tasks={tasks} />
-        </div>
-      )}
-
-      {/* ---------- TASK LIST (comes AFTER gantt) ---------- */}
-      {tasks.length > 0 && (
-        <div className="task-list">
-          {tasks.map((task) => (
-            <TaskItem
-              key={task._id}
-              task={task}
-              projectId={project._id}
-              token={token}
-              onDelete={deleteTask}
-              onUpdate={updateTask}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ---------- TaskItem ---------- */
-function TaskItem({ task, projectId, token, onDelete, onUpdate }) {
-  const [editing, setEditing] = useState(false);
-  const [name, setName] = useState(task.name);
-  const [startDate, setStartDate] = useState(task.startDate || "");
-  const [endDate, setEndDate] = useState(task.endDate || "");
-
-  const save = async () => {
-    const res = await fetch(
-      `http://localhost:5000/api/projects/${projectId}/tasks/${task._id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name, startDate, endDate }),
-      }
-    );
-    const updated = await res.json();
-    onUpdate(updated);
-    setEditing(false);
-  };
-
-  return (
-    <div className="task-item">
-      {!editing ? (
-        <>
-          <span>{task.name}</span>
-          <div>
-            <button className="edit-btn" onClick={() => setEditing(true)}>Edit</button>
-            <button className="delete-btn" onClick={() => onDelete(task._id)}>Delete</button>
+          <div className="project-actions">
+            <button onClick={() => setEditing(true)}>Edit</button>
+            <button onClick={() => onDelete(project._id)}>Delete</button>
+            <button
+              className="btn-add"
+              onClick={() => setShowAddTask(!showAddTask)}
+            >
+              Add Task
+            </button>
+            <button
+              className="btn-tasks"
+              onClick={() => setShowTasks(!showTasks)}
+            >
+              Tasks
+            </button>
           </div>
         </>
-      ) : (
-        <div className="task-edit-form">
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+      )}
+
+      {/* ---------- Add Task ---------- */}
+      {showAddTask && (
+        <div className="task-form">
+          <input
+            placeholder="Task name"
+            value={taskName}
+            onChange={(e) => setTaskName(e.target.value)}
+          />
           <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
           <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-          <button className="save-btn" onClick={save}>Save</button>
-          <button className="cancel-btn" onClick={() => setEditing(false)}>Cancel</button>
+          <button onClick={addTask}>Add</button>
+        </div>
+      )}
+
+      {/* ---------- Gantt ---------- */}
+      {tasks.length > 0 && <GanttChart tasks={tasks} />}
+
+      {/* ---------- Task List + Edit ---------- */}
+      {showTasks && (
+        <div className="task-list">
+          {tasks.map((task) => (
+            <div key={task._id} className="task-row">
+              {editingTaskId === task._id ? (
+                <>
+                  <input
+                    value={editTaskName}
+                    onChange={(e) => setEditTaskName(e.target.value)}
+                  />
+                  <input
+                    type="date"
+                    value={editStartDate}
+                    onChange={(e) => setEditStartDate(e.target.value)}
+                  />
+                  <input
+                    type="date"
+                    value={editEndDate}
+                    onChange={(e) => setEditEndDate(e.target.value)}
+                  />
+                  <button onClick={() => saveTask(task._id)}>Save</button>
+                </>
+              ) : (
+                <>
+                  <span>{task.name}</span>
+                  <div className="task-actions">
+                    <button onClick={() => startEditTask(task)}>Edit</button>
+                    <button onClick={() => deleteTask(task._id)}>Delete</button>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>
