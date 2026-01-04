@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import GanttChart from "./GanttChart";
 
 const API_PROJECTS = "http://localhost:5000/api/projects";
 
@@ -167,6 +168,8 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
               <button onClick={() => deleteTask(task._id)} style={{ background: "#e53935", color: "#fff", border: "none", padding: "4px 8px", borderRadius: "4px", cursor: "pointer" }}>Delete</button>
             </div>
           ))}
+       {/* ---------- Gantt Chart ---------- */}
+        {tasks.length > 0 && <GanttChart tasks={tasks} />}
         </div>
       )}
     </div>
