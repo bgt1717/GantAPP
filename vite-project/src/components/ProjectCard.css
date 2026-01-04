@@ -1,0 +1,92 @@
+.project-card {
+  border: 1px solid #ddd;
+  color: black;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background: #fff;
+  font-family: Arial, sans-serif;
+}
+
+.project-card h3 {
+  margin: 0 0 8px 0;
+}
+
+.project-card p {
+  margin: 0 0 12px 0;
+}
+
+/* Buttons */
+.project-card button {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 8px 14px;
+  border: none;
+  color: #fff;
+  margin-right: 8px;
+}
+
+.project-card .edit-btn {
+  background: #1976d2;
+}
+
+.project-card .cancel-btn {
+  background: #9e9e9e;
+}
+
+.project-card .delete-btn {
+  background: #e53935;
+}
+
+.project-card .add-task-toggle {
+  background: #8bc34a;
+  padding: 6px 12px;
+}
+
+/* Add Task Form */
+.add-task-form {
+  margin-top: 12px;
+  background: black;
+  padding: 12px;
+  border-radius: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.add-task-form input[type="text"] {
+  flex: 1 1 100%;
+  padding: 6px;
+}
+
+.add-task-form input[type="date"] {
+  flex: 1 1 48%;
+  padding: 6px;
+}
+
+.add-task-form button {
+  flex: 1 1 100%;
+  background: #1976d2;
+  margin-top: 6px;
+}
+
+/* Task List */
+.task-list {
+  margin-top: 16px;
+}
+
+.task-item {
+  border: 1px solid #020202ff;
+  color: black;
+  padding: 8px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-item .delete-btn {
+  background: #e53935;
+  padding: 4px 8px;
+}
