@@ -103,11 +103,9 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
     );
 
     const updatedTask = await res.json();
-
     setTasks((prev) =>
       prev.map((t) => (t._id === taskId ? updatedTask : t))
     );
-
     setEditingTaskId(null);
   };
 
@@ -146,19 +144,19 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
 
       {/* ---------- Buttons section ---------- */}
       <div className="project-actions">
-        {/* Add Task always visible */}
         <button
           className="btn-add"
           onClick={() => setShowAddTask(!showAddTask)}
         >
           Add Task
         </button>
+        {/* Delete project always visible */}
+        <button onClick={() => onDelete(project._id)}>Delete Project</button>
 
-        {/* Only show these if tasks exist */}
+        {/* Only show when tasks exist */}
         {tasks.length > 0 && (
           <>
             <button onClick={() => setEditing(true)}>Edit Project</button>
-            <button onClick={() => onDelete(project._id)}>Delete Project</button>
             <button
               className="btn-tasks"
               onClick={() => setShowTasks(!showTasks)}
