@@ -151,7 +151,7 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
           Add Task
         </button>
         {/* Delete project always visible */}
-        <button onClick={() => onDelete(project._id)}>Delete Project</button>
+        <button className="btn-delete" onClick={() => onDelete(project._id)}>Delete Project</button>
 
         {/* Only show when tasks exist */}
         {tasks.length > 0 && (
