@@ -117,7 +117,7 @@ export default function Projects() {
 
       {/* ---------- Toggle Add Project ---------- */}
       <button
-        className="btn-add-project"
+        className="add-project"
         onClick={() => setShowAddProject(!showAddProject)}
       >
         + Add Project

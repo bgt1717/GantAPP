@@ -21,6 +21,7 @@
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -34,11 +35,39 @@
 }
 
 .add-project-form button {
-  background: #1976d2;
+  background: #8c0d6c;
   color: #fff;
   border: none;
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
   align-self: flex-start;
+}
+.add-project-form button:hover {
+  background: #b8088c;
+
+}
+
+/* ---------- ADD PROJECT ---------- */
+.add-project {
+  border: none;
+  background-color: #8c0d6c;
+  color:white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.add-project input,
+.add-project textarea {
+  padding: 4px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+
+.add-project:hover {
+  background: #b8088c;
 }

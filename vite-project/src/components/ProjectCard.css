@@ -4,6 +4,7 @@
   padding: 18px;
   border-radius: 10px;
   margin-bottom: 16px;
+  margin-top:16px;
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -104,12 +105,18 @@
 }
 
 .task-form button {
-  background: #4caf50;
-  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  background-color: #8bc34a;
+  color: white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .task-form button:hover {
-  background: #43a047;
+  background: #7cb342;
 }
 
 /* ---------- TASK LIST ---------- */
