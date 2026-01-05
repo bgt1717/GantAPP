@@ -1,50 +1,187 @@
+/* ---------- CARD ---------- */
 .project-card {
-  border: 1px solid #ddd;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  background: #fff;
+  border: 1px solid #e0e0e0;
+  padding: 18px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+/* ---------- HEADINGS ---------- */
+.project-card h3 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+}
+
+.project-card p {
+  margin: 0 0 10px;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* ---------- ACTION BUTTON BAR ---------- */
 .project-actions {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
-  margin-top: 12px;
+  gap: 10px;
+  margin-top: 14px;
 }
 
+/* ---------- BASE BUTTON ---------- */
+.project-actions button,
+.task-actions button {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.project-actions button:active,
+.task-actions button:active {
+  transform: scale(0.97);
+}
+
+/* ---------- ADD TASK ---------- */
 .btn-add {
   background: #8bc34a;
   color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
+.btn-add:hover {
+  background: #7cb342;
+}
+
+/* ---------- EDIT PROJECT ---------- */
+.project-actions button:not(.btn-add):not(.btn-tasks):not(.btn-delete) {
+  background: #1976d2;
+  color: #fff;
+}
+
+.project-actions button:not(.btn-add):not(.btn-tasks):not(.btn-delete):hover {
+  background: #1565c0;
+}
+
+/* ---------- TASK LIST TOGGLE ---------- */
 .btn-tasks {
   background: #607d8b;
   color: #fff;
-  border: none;
-  padding: 6px 12px;
+}
+
+.btn-tasks:hover {
+  background: #546e7a;
+}
+
+/* ---------- DELETE PROJECT ---------- */
+.btn-delete {
+  background: #e53935;
+  color: #fff;
+}
+
+.btn-delete:hover {
+  background: #d32f2f;
+}
+
+/* ---------- TASK FORM ---------- */
+.task-form {
+  margin-top: 14px;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 1fr 150px 150px auto;
+  gap: 8px;
+}
+
+.task-form input {
+  padding: 8px;
   border-radius: 6px;
-  cursor: pointer;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
 }
 
-.task-form,
+.task-form button {
+  background: #4caf50;
+  color: #fff;
+}
+
+.task-form button:hover {
+  background: #43a047;
+}
+
+/* ---------- TASK LIST ---------- */
 .task-list {
-  margin-top: 12px;
+  margin-top: 14px;
+  border-top: 1px solid #eee;
+  padding-top: 8px;
 }
 
+/* ---------- TASK ROW ---------- */
 .task-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  padding: 6px 0;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.9rem;
 }
 
+.task-row:last-child {
+  border-bottom: none;
+}
+
+/* ---------- TASK ACTIONS ---------- */
 .task-actions {
   display: flex;
   gap: 6px;
+}
+
+/* ---------- TASK EDIT BUTTON ---------- */
+.task-actions button:first-child {
+  background: #ffa000;
+  color: #fff;
+}
+
+.task-actions button:first-child:hover {
+  background: #fb8c00;
+}
+
+/* ---------- TASK DELETE BUTTON ---------- */
+.task-actions button:last-child {
+  background: #e53935;
+  color: #fff;
+}
+
+.task-actions button:last-child:hover {
+  background: #d32f2f;
+}
+
+/* ---------- EDITING TASK INPUTS ---------- */
+.task-row input {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 768px) {
+  .task-form {
+    grid-template-columns: 1fr;
+  }
+
+  .project-actions {
+    gap: 8px;
+  }
+
+  .task-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .task-actions {
+    align-self: flex-end;
+  }
 }
