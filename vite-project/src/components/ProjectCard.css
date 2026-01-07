@@ -74,13 +74,14 @@
 
 /* Cancel Button */
 .project-card .cancel-btn {
-  background: #f3f4f6;
-  color: #374151;
+  background: #cfd0d3;
+  color: #000000;
   border: 1px solid #d1d5db;
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
+  margin-left: 1px;
   transition: background 0.2s, border-color 0.2s;
 }
 
@@ -126,7 +127,7 @@
 
 /* ---------- EDIT PROJECT ---------- */
 .project-actions button:not(.btn-add):not(.btn-tasks):not(.btn-delete) {
-  background: #1976d2;
+  background: #1565c0;
   color: #fff;
 }
 
@@ -240,6 +241,27 @@
   border-radius: 6px;
   border: 1px solid #ccc;
 }
+
+/* ---------- TASK ROW SAVE BUTTON ---------- */
+.task-row .save-btn {
+  background: #22c55e; /* green */
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.task-row .save-btn:hover {
+  background: #16a34a;
+}
+
+.task-row .save-btn:active {
+  transform: scale(0.96);
+}
+
 
 /* ---------- MOBILE ---------- */
 @media (max-width: 768px) {

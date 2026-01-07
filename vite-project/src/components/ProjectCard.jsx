@@ -129,8 +129,8 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
-          <button onClick={saveProject}>Save</button>
-          <button onClick={() => setEditing(false)}>Cancel</button>
+          <button className="save-btn" onClick={saveProject}>Save</button>
+          <button className="cancel-btn" onClick={() => setEditing(false)}>Cancel</button>
         </>
       ) : (
         <>
