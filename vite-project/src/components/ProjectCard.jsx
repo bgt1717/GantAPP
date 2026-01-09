@@ -210,7 +210,7 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
                     value={editEndDate}
                     onChange={(e) => setEditEndDate(e.target.value)}
                   />
-                  <button onClick={() => saveTask(task._id)}>Save</button>
+                  <button className="save-btn" onClick={() => saveTask(task._id)}>Save</button>
                 </>
               ) : (
                 <>
