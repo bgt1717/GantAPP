@@ -71,3 +71,29 @@
 .add-project:hover {
   background: #b8088c;
 }
+
+/* ---------- ADD PROJECT ACTIONS ---------- */
+.add-project-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.add-project-actions button {
+  width: auto;
+}
+/* ---------- ADD PROJECT CANCEL BUTTON ---------- */
+.add-project-cancel {
+  background: #e5e7eb;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.add-project-cancel:hover {
+  background: #d1d5db;
+  border-color: #9ca3af;
+}

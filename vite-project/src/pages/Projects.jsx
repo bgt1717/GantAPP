@@ -115,29 +115,46 @@ export default function Projects() {
       <h2>Your Projects</h2>
       {error && <p className="error">{error}</p>}
 
-      {/* ---------- Toggle Add Project ---------- */}
-      <button
-        className="add-project"
-        onClick={() => setShowAddProject(!showAddProject)}
-      >
-        + Add Project
-      </button>
+{/* ---------- Toggle Add Project ---------- */}
+<button
+  className="add-project"
+  onClick={() => setShowAddProject(!showAddProject)}
+>
+  + Add Project
+</button>
 
-      {showAddProject && (
-        <div className="add-project-form">
-          <input
-            placeholder="Project name"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-          />
-          <textarea
-            placeholder="Description (optional)"
-            value={newDescription}
-            onChange={(e) => setNewDescription(e.target.value)}
-          />
-          <button onClick={addProject}>Add</button>
-        </div>
-      )}
+{showAddProject && (
+  <div className="add-project-form">
+    <input
+      placeholder="Project name"
+      value={newName}
+      onChange={(e) => setNewName(e.target.value)}
+    />
+
+    <textarea
+      placeholder="Description (optional)"
+      value={newDescription}
+      onChange={(e) => setNewDescription(e.target.value)}
+    />
+
+    {/* ---------- ACTION BUTTONS ---------- */}
+    <div className="add-project-actions">
+      <button onClick={addProject}>Add</button>
+
+      <button
+        className="add-project-cancel"
+        onClick={() => {
+          setShowAddProject(false);
+          setNewName("");
+          setNewDescription("");
+        }}
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+
 
       {/* ---------- Project list ---------- */}
       {projects.length === 0 ? (
