@@ -139,10 +139,10 @@ export default function Projects() {
 
     {/* ---------- ACTION BUTTONS ---------- */}
     <div className="add-project-actions">
-      <button onClick={addProject}>Add</button>
+      <button className="btn-add" onClick={addProject}>Add</button>
 
       <button
-        className="add-project-cancel"
+        className="btn-cancel"
         onClick={() => {
           setShowAddProject(false);
           setNewName("");

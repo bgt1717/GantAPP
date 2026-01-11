@@ -34,19 +34,7 @@
   box-sizing: border-box;
 }
 
-.add-project-form button {
-  background: #8c0d6c;
-  color: #fff;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  align-self: flex-start;
-}
-.add-project-form button:hover {
-  background: #b8088c;
 
-}
 
 /* ---------- ADD PROJECT ---------- */
 .add-project {
@@ -82,15 +70,27 @@
   width: auto;
 }
 /* ---------- ADD PROJECT CANCEL BUTTON ---------- */
-.add-project-cancel {
-  background: #e5e7eb;
-  color: #374151;
+.btn-cancel {
+  background: #cfd0d3;
+  color: #000000;
   border: 1px solid #d1d5db;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  margin-left: 1px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-add {
+  background: #22a240;
+  color: white;
+  border: 1px solid #d1d5db;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .add-project-cancel:hover {

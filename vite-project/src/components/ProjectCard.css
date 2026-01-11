@@ -305,7 +305,8 @@
 .task-edit-actions {
   display: flex;
   gap: 4px;
-  margin-top: 4px;
+  margin-left: 4px;
+ 
 }
 
 .task-edit-actions button {
