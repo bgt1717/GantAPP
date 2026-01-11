@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import "./Login.css";
 
 const API = "http://localhost:5000";
 
@@ -20,7 +21,7 @@ export default function Login({ onLoginSuccess }) {
     const data = await res.json();
 
     if (res.ok && data.token) {
-      onLoginSuccess(data.token); // 🔥 THIS FIXES IT
+      onLoginSuccess(data.token);
       navigate("/projects");
     } else {
       alert(data.message || "Login failed");
@@ -28,29 +29,41 @@ export default function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div className="auth">
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Login</button>
-      </form>
+    <div className="login-page">
+      <div className="login-card">
+        <h2 className="login-title">Login</h2>
 
-      <p>
-        Don’t have an account? <Link to="/register">Register</Link>
-      </p>
+        <form className="login-form" onSubmit={handleLogin}>
+          <input
+            className="login-input"
+            type="email"
+            placeholder="Email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            className="login-input"
+            type="password"
+            placeholder="Password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button className="login-button" type="submit">
+            Login
+          </button>
+        </form>
+
+        <p className="login-footer">
+          Don’t have an account?{" "}
+          <Link className="login-link" to="/register">
+            Register
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "./Register.css";
 
 const API = "http://localhost:5000";
 
 export default function Register() {
-  const [name, setName] = useState(""); // optional if your backend requires
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -16,14 +16,14 @@ export default function Register() {
       const res = await fetch(`${API}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }), // add name if required
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
       if (res.ok && data.token) {
         localStorage.setItem("token", data.token);
-        navigate("/projects"); // redirect after successful registration
+        navigate("/projects");
       } else {
         alert(data.message || "Registration failed");
       }
@@ -34,39 +34,41 @@ export default function Register() {
   };
 
   return (
-    <div className="auth">
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Register</button>
-      </form>
+    <div className="register-page">
+      <div className="register-card">
+        <h2 className="register-title">Register</h2>
 
-      <p style={{ marginTop: "10px" }}>
-        Already have an account?{" "}
-        <Link
-          to="/login"
-          style={{
-            color: "#2196f3",
-            textDecoration: "underline",
-            cursor: "pointer",
-          }}
-        >
-          Login
-        </Link>
-      </p>
+        <form className="register-form" onSubmit={handleRegister}>
+          <input
+            className="register-input"
+            type="email"
+            placeholder="Email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            className="register-input"
+            type="password"
+            placeholder="Password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button className="register-button" type="submit">
+            Register
+          </button>
+        </form>
+
+        <p className="register-footer">
+          Already have an account?{" "}
+          <Link className="register-link" to="/login">
+            Login
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
