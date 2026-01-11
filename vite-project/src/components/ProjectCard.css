@@ -20,6 +20,7 @@
   color: #666;
   font-size: 0.95rem;
 }
+
 /* ---------- PROJECT CARD EDIT MODE ---------- */
 .project-card input,
 .project-card textarea {
@@ -47,7 +48,7 @@
 /* ---------- ACTION BUTTONS ---------- */
 .project-card .actions {
   display: flex;
-  gap: 10px;
+  gap: 4px;
   margin-top: 8px;
 }
 
@@ -91,10 +92,9 @@
 
 /* ---------- ACTION BUTTON BAR ---------- */
 .project-actions {
-  
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 4px;
   margin-top: 14px;
 }
 
@@ -162,7 +162,7 @@
   border-radius: 8px;
   display: grid;
   grid-template-columns: 1fr 150px 150px auto;
-  gap: 8px;
+  gap: 4px;
 }
 
 .task-form input {
@@ -187,25 +187,33 @@
   background: #7cb342;
 }
 
+/* ---------- TASK FORM ACTIONS (Add/Cancel) ---------- */
+.task-form-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.task-form-actions .btn-cancel {
+  background: #cfd0d3;
+  color: #000;
+  border: 1px solid #d1d5db;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.task-form-actions .btn-cancel:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
 /* ---------- TASK LIST ---------- */
 .task-list {
   margin-top: 14px;
   border-top: 1px solid #eee;
   padding-top: 8px;
 }
-
-/* ---------- TASK LIST ACTION BUTTONS ---------- */
-.save-button {
-  background: transparent;
-  border: 1px solid #d1d5db;
-  color: #374151;
-  padding: 4px 10px;
-  border-radius: 5px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-
 
 /* ---------- TASK ROW ---------- */
 .task-row {
@@ -224,7 +232,7 @@
 /* ---------- TASK ACTIONS ---------- */
 .task-actions {
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
 
 /* ---------- TASK EDIT BUTTON ---------- */
@@ -253,19 +261,18 @@
   border-radius: 6px;
   border: 1px solid #ccc;
 }
-/* 
----------- TASK ROW SAVE BUTTON ---------- */
+
+/* ---------- INLINE TASK SAVE BUTTON ---------- */
 .task-row .save-btn {
   background: #8bc34a;
   color: white;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
   font-size: 0.9rem;
+  cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
-  margin-left: 6px;
+  margin-left: 1px;
 }
 
 .task-row .save-btn:hover {
@@ -276,21 +283,71 @@
   transform: scale(0.96);
 }
 
+/* ---------- INLINE TASK CANCEL BUTTON ---------- */
+.task-row .cancel-btn {
+  background: #cfd0d3;
+  color: #000;
+  border: 1px solid #d1d5db;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-left: 1px;
+  transition: background 0.2s, border-color 0.2s;
+}
 
-/* ---------- MOBILE ---------- */
+.task-row .cancel-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+/* ---------- TASK EDIT ACTIONS ---------- */
+.task-edit-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.task-edit-actions button {
+  width: auto;
+}
+
+/* ---------- GANTT CHART CANCEL BUTTON ---------- */
+.gantt-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.gantt-actions .btn-cancel {
+  background: #cfd0d3;
+  color: #000;
+  border: 1px solid #d1d5db;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.gantt-actions .btn-cancel:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+/* ---------- MOBILE RESPONSIVE ---------- */
 @media (max-width: 768px) {
   .task-form {
     grid-template-columns: 1fr;
   }
 
   .project-actions {
-    gap: 8px;
+    gap: 4px;
   }
 
   .task-row {
     flex-direction: column;
     align-items: flex-start;
-    gap: 6px;
+    gap: 4px;
   }
 
   .task-actions {

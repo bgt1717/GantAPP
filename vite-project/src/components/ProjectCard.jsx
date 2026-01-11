@@ -4,6 +4,8 @@ import "./ProjectCard.css";
 
 const API_PROJECTS = "http://localhost:5000/api/projects";
 
+
+
 export default function ProjectCard({ project, onDelete, onUpdate }) {
   const token = localStorage.getItem("token");
 
@@ -152,7 +154,7 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
         </button>
         {/* Delete project always visible */}
         <button className="btn-delete" onClick={() => onDelete(project._id)}>Delete Project</button>
-
+      
         {/* Only show when tasks exist */}
         {tasks.length > 0 && (
           <>
@@ -185,46 +187,83 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
-          <button onClick={addTask}>Add</button>
+
+          <div className="task-form-actions">
+            <button onClick={addTask}>Add</button>
+            <button
+              className="cancel-btn"
+              onClick={() => {
+                setShowAddTask(false);
+                setTaskName("");
+                setStartDate("");
+                setEndDate("");
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
 
-      {/* ---------- Task List ---------- */}
-      {showTasks && tasks.length > 0 && (
-        <div className="task-list">
-          {tasks.map((task) => (
-            <div key={task._id} className="task-row">
-              {editingTaskId === task._id ? (
-                <>
-                  <input
-                    value={editTaskName}
-                    onChange={(e) => setEditTaskName(e.target.value)}
-                  />
-                  <input
-                    type="date"
-                    value={editStartDate}
-                    onChange={(e) => setEditStartDate(e.target.value)}
-                  />
-                  <input
-                    type="date"
-                    value={editEndDate}
-                    onChange={(e) => setEditEndDate(e.target.value)}
-                  />
-                  <button className="save-btn" onClick={() => saveTask(task._id)}>Save</button>
-                </>
-              ) : (
-                <>
-                  <span>{task.name}</span>
-                  <div className="task-actions">
-                    <button onClick={() => startEditTask(task)}>Edit</button>
-                    <button onClick={() => deleteTask(task._id)}>Delete</button>
-                  </div>
-                </>
-              )}
+    {/* ---------- Task List ---------- */}
+{showTasks && tasks.length > 0 && (
+  <div className="task-list">
+    {tasks.map((task) => (
+      <div key={task._id} className="task-row">
+        {editingTaskId === task._id ? (
+          <>
+            {/* ---------- Inline Edit Inputs ---------- */}
+            <input
+              value={editTaskName}
+              onChange={(e) => setEditTaskName(e.target.value)}
+            />
+            <input
+              type="date"
+              value={editStartDate}
+              onChange={(e) => setEditStartDate(e.target.value)}
+            />
+            <input
+              type="date"
+              value={editEndDate}
+              onChange={(e) => setEditEndDate(e.target.value)}
+            />
+
+            {/* ---------- Save / Cancel Buttons ---------- */}
+            <div className="task-edit-actions">
+              <button
+                className="save-btn"
+                onClick={() => saveTask(task._id)}
+              >
+                Save
+              </button>
+              <button
+                className="cancel-btn"
+                onClick={() => setEditingTaskId(null)}
+              >
+                Cancel
+              </button>
             </div>
-          ))}
-        </div>
-      )}
+          </>
+        ) : (
+          <>
+            {/* ---------- Display Task ---------- */}
+            <span>{task.name}</span>
+            <div className="task-actions">
+              <button onClick={() => startEditTask(task)}>Edit</button>
+              <button
+                onClick={() => deleteTask(task._id)}
+                className="btn-delete"
+              >
+                Delete
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    ))}
+  </div>
+)}
+
     </div>
   );
 }

@@ -75,7 +75,7 @@
 /* ---------- ADD PROJECT ACTIONS ---------- */
 .add-project-actions {
   display: flex;
-  gap: 10px;
+  gap: 4px;
   align-items: center;
 }
 .add-project-actions button {
