@@ -123,20 +123,19 @@
 .btn-add:hover {
   background: #7cb342;
 }
-
-/* ---------- EDIT PROJECT ---------- */
-.project-actions button:not(.btn-add):not(.btn-tasks):not(.btn-delete) {
-  background: #1565c0;
-  color: #fff;
+.btn-edit-main{
+  background-color: orange;
+  color: white;
+}
+.btn-edit-main:hover{
+  background-color: rgb(190, 126, 8);
+  color: rgb(255, 255, 255);
 }
 
-.project-actions button:not(.btn-add):not(.btn-tasks):not(.btn-delete):hover {
-  background: #1565c0;
-}
 
 /* ---------- TASK LIST TOGGLE ---------- */
 .btn-tasks {
-  background: #607d8b;
+  background: #3401c2;
   color: #fff;
 }
 
@@ -192,6 +191,15 @@
   display: flex;
   gap: 4px;
   align-items: center;
+}
+
+.cancel-btn-main{
+  background: #cfd0d3;
+  color: #000;
+  border: 1px solid #d1d5db;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .task-form-actions .btn-cancel {

@@ -144,30 +144,67 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
       {/* ---------- Gantt chart ---------- */}
       {tasks.length > 0 && <GanttChart tasks={tasks} />}
 
-      {/* ---------- Buttons section ---------- */}
-      <div className="project-actions">
+ {/* ---------- Buttons section ---------- */}
+<div className="project-actions">
+
+  {/* ---------- ADD TASK / CANCEL ---------- */}
+  {!showAddTask ? (
+    <button
+      className="btn-add"
+      onClick={() => setShowAddTask(true)}
+    >
+      Add Task
+    </button>
+  ) : (
+    <button
+      className="cancel-btn"
+      onClick={() => {
+        setShowAddTask(false);
+      }}
+    >
+      Cancel
+    </button>
+  )}
+
+  {/* ---------- DELETE PROJECT ---------- */}
+  <button
+    className="btn-delete"
+    onClick={() => onDelete(project._id)}
+  >
+    Delete Project
+  </button>
+
+  {/* ---------- ONLY SHOW WHEN TASKS EXIST ---------- */}
+  {tasks.length > 0 && (
+    <>
+      {/* ---------- EDIT PROJECT ---------- */}
+      <button className = "btn-edit-main" onClick={() => setEditing(true)}>
+        Edit Project
+      </button>
+
+      {/* ---------- TASKS / CANCEL ---------- */}
+      {!showTasks ? (
         <button
-          className="btn-add"
-          onClick={() => setShowAddTask(!showAddTask)}
+          className="btn-tasks"
+          onClick={() => setShowTasks(true)}
         >
-          Add Task
+          Tasks
         </button>
-        {/* Delete project always visible */}
-        <button className="btn-delete" onClick={() => onDelete(project._id)}>Delete Project</button>
-      
-        {/* Only show when tasks exist */}
-        {tasks.length > 0 && (
-          <>
-            <button onClick={() => setEditing(true)}>Edit Project</button>
-            <button
-              className="btn-tasks"
-              onClick={() => setShowTasks(!showTasks)}
-            >
-              Tasks
-            </button>
-          </>
-        )}
-      </div>
+      ) : (
+        <button
+          className="cancel-btn-main"
+          onClick={() => {
+            setShowTasks(false);
+            setEditingTaskId(null);
+          }}
+        >
+          Cancel
+        </button>
+      )}
+    </>
+  )}
+</div>
+
 
       {/* ---------- Add Task Form ---------- */}
       {showAddTask && (
