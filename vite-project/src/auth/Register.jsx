@@ -5,6 +5,7 @@ import "./Register.css";
 const API = "http://localhost:5000";
 
 export default function Register() {
+  const [name, setName] = useState("");     // ✅ REQUIRED
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -16,7 +17,11 @@ export default function Register() {
       const res = await fetch(`${API}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          name,        // ✅ SEND NAME
+          email,
+          password,
+        }),
       });
 
       const data = await res.json();
@@ -39,6 +44,15 @@ export default function Register() {
         <h2 className="register-title">Register</h2>
 
         <form className="register-form" onSubmit={handleRegister}>
+          <input
+            className="register-input"
+            type="text"
+            placeholder="Name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+
           <input
             className="register-input"
             type="email"
