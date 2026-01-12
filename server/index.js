@@ -19,10 +19,22 @@ const app = express();
 
 // ---------- MIDDLEWARE ----------
 
-// Enable CORS for frontend
+// Enable CORS for multiple origins (dev + deployed frontend)
+const allowedOrigins = [
+  "http://localhost:5173",               // local Vite
+  "https://ganttapp-pe5h.onrender.com", // deployed frontend
+];
+
 app.use(cors({
-  origin: "http://localhost:5173", // your Vite frontend
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true); // allow server-to-server, Postman, etc.
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `CORS policy does not allow access from ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
 }));
 
@@ -37,16 +49,19 @@ app.use((req, res, next) => {
 
 // ---------- ROUTES ----------
 
+// Auth routes
 app.use("/auth", authRoutes);
-app.use("/api/projects", projectRoutes);
-app.use("/api/projects/:projectId/tasks", taskRoutes);
 
+// Project routes
+app.use("/api/projects", projectRoutes);
+
+// Task routes: use mergeParams in task router so projectId is accessible
+app.use("/api/projects/:projectId/tasks", taskRoutes);
 
 // ---------- ERROR HANDLER ----------
 app.use(errorHandler);
 
 // ---------- DATABASE CONNECTION ----------
-
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
@@ -62,5 +77,5 @@ connectDB();
 // ---------- START SERVER ----------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
