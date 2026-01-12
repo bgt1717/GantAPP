@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import GanttChart from "./GanttChart";
 import "./ProjectCard.css";
 
-const API_PROJECTS = "http://localhost:5000/api/projects";
-
+const API_PROJECTS = import.meta.env.VITE_API_PROJECTS;
 
 
 export default function ProjectCard({ project, onDelete, onUpdate }) {

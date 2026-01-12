@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
 
-const API = "http://localhost:5000";
+const API = import.meta.env.VITE_API_URL;
+
 
 export default function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState("");

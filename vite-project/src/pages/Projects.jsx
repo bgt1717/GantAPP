@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import ProjectCard from "../components/ProjectCard";
 import "./Projects.css";
 
-const API = "http://localhost:5000/api/projects";
+// ✅ Use VITE_ environment variables
+const API_PROJECTS = import.meta.env.VITE_API_PROJECTS;
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -22,7 +23,7 @@ export default function Projects() {
 
     const fetchProjects = async () => {
       try {
-        const res = await fetch(API, {
+        const res = await fetch(API_PROJECTS, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch projects");
@@ -44,7 +45,7 @@ export default function Projects() {
     if (!newName.trim()) return;
 
     try {
-      const res = await fetch(API, {
+      const res = await fetch(API_PROJECTS, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,10 +55,9 @@ export default function Projects() {
       });
 
       if (!res.ok) throw new Error("Failed to create project");
-
       const createdProject = await res.json();
-      setProjects((prev) => [createdProject, ...prev]);
 
+      setProjects((prev) => [createdProject, ...prev]);
       setNewName("");
       setNewDescription("");
       setShowAddProject(false);
@@ -71,7 +71,7 @@ export default function Projects() {
   /* ---------- UPDATE PROJECT ---------- */
   const updateProject = async (updatedProject) => {
     try {
-      const res = await fetch(`${API}/${updatedProject._id}`, {
+      const res = await fetch(`${API_PROJECTS}/${updatedProject._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export default function Projects() {
   /* ---------- DELETE PROJECT ---------- */
   const deleteProject = async (id) => {
     try {
-      const res = await fetch(`${API}/${id}`, {
+      const res = await fetch(`${API_PROJECTS}/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -115,46 +115,46 @@ export default function Projects() {
       <h2>Your Projects</h2>
       {error && <p className="error">{error}</p>}
 
-{/* ---------- Toggle Add Project ---------- */}
-<button
-  className="add-project"
-  onClick={() => setShowAddProject(!showAddProject)}
->
-  + Add Project
-</button>
-
-{showAddProject && (
-  <div className="add-project-form">
-    <input
-      placeholder="Project name"
-      value={newName}
-      onChange={(e) => setNewName(e.target.value)}
-    />
-
-    <textarea
-      placeholder="Description (optional)"
-      value={newDescription}
-      onChange={(e) => setNewDescription(e.target.value)}
-    />
-
-    {/* ---------- ACTION BUTTONS ---------- */}
-    <div className="add-project-actions">
-      <button className="btn-add" onClick={addProject}>Add</button>
-
+      {/* ---------- Toggle Add Project ---------- */}
       <button
-        className="btn-cancel"
-        onClick={() => {
-          setShowAddProject(false);
-          setNewName("");
-          setNewDescription("");
-        }}
+        className="add-project"
+        onClick={() => setShowAddProject(!showAddProject)}
       >
-        Cancel
+        + Add Project
       </button>
-    </div>
-  </div>
-)}
 
+      {showAddProject && (
+        <div className="add-project-form">
+          <input
+            placeholder="Project name"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <textarea
+            placeholder="Description (optional)"
+            value={newDescription}
+            onChange={(e) => setNewDescription(e.target.value)}
+          />
+
+          {/* ---------- ACTION BUTTONS ---------- */}
+          <div className="add-project-actions">
+            <button className="btn-add" onClick={addProject}>
+              Add
+            </button>
+
+            <button
+              className="btn-cancel"
+              onClick={() => {
+                setShowAddProject(false);
+                setNewName("");
+                setNewDescription("");
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ---------- Project list ---------- */}
       {projects.length === 0 ? (
