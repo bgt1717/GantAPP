@@ -97,3 +97,29 @@
   background: #d1d5db;
   border-color: #9ca3af;
 }
+
+.demo-banner {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  color: #856404;
+}
+
+.demo-register-link {
+  color: #0d6efd; /* Bootstrap-like blue link color */
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.demo-register-link:hover {
+  color: #0a58ca;
+}
+

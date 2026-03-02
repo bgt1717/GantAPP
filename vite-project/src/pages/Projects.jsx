@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom"; // Link must be imported here
 import ProjectCard from "../components/ProjectCard";
-import { useNavigate } from "react-router-dom";
 import "./Projects.css";
 
 const API_PROJECTS = import.meta.env.VITE_API_PROJECTS;
@@ -165,14 +165,20 @@ export default function Projects({ isDemo }) {
     <div className="projects-container">
       <h2>Your Projects</h2>
       {error && <p className="error">{error}</p>}
-
       {isDemo && (
-        <div className="demo-banner">
-          Demo Mode – Your work will not be saved.
-          <button onClick={() => navigate("/register")}>Create Free Account</button>
-        </div>
-      )}
-
+  <div className="demo-banner">
+    <span>Demo Mode – Your work will not be saved.</span>
+    {/* <button
+      className="demo-register-button"
+      onClick={() => {
+        onLogout();        // call App.jsx logout
+        navigate("/register"); // redirect to register page
+      }}
+    >
+      Create Free Account
+    </button> */}
+  </div>
+)}
       <button
         className="add-project"
         onClick={() => setShowAddProject(!showAddProject)}
