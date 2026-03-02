@@ -95,3 +95,25 @@
     padding: 24px 20px;
   }
 }
+
+/* Demo button style */
+.demo-button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #19d27f; /* Slightly different blue from login button */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.demo-button:hover {
+  background-color: #1b6409; /* Darker blue on hover */
+}
+
+.demo-button:active {
+  background-color: #1b6409;
+}
