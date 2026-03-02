@@ -56,6 +56,13 @@ export default function Login({ onLoginSuccess }) {
           <button className="login-button" type="submit">
             Login
           </button>
+          <button
+          type="button"
+          className="demo-button"
+          onClick={() => onLoginSuccess("demo-user")}
+        >
+          Try Demo (No Account Required)
+        </button>
         </form>
 
         <p className="login-footer">

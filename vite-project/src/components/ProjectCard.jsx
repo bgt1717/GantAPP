@@ -4,33 +4,32 @@ import "./ProjectCard.css";
 
 const API_PROJECTS = import.meta.env.VITE_API_PROJECTS;
 
-
-export default function ProjectCard({ project, onDelete, onUpdate }) {
+export default function ProjectCard({ project, onDelete, onUpdate, isDemo }) {
   const token = localStorage.getItem("token");
 
-  /* ---------- Project edit ---------- */
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description || "");
 
-  /* ---------- Tasks state ---------- */
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(project.tasks || []);
   const [showAddTask, setShowAddTask] = useState(false);
   const [showTasks, setShowTasks] = useState(false);
 
-  /* ---------- Add task form ---------- */
   const [taskName, setTaskName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  /* ---------- Editing task ---------- */
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editTaskName, setEditTaskName] = useState("");
   const [editStartDate, setEditStartDate] = useState("");
   const [editEndDate, setEditEndDate] = useState("");
 
-  /* ---------- Fetch tasks ---------- */
   useEffect(() => {
+    if (isDemo) {
+      setTasks(project.tasks || []);
+      return;
+    }
+
     const fetchTasks = async () => {
       const res = await fetch(`${API_PROJECTS}/${project._id}/tasks`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -39,10 +38,15 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
       setTasks(data);
     };
     fetchTasks();
-  }, [project._id, token]);
+  }, [project._id, token, isDemo]);
 
-  /* ---------- Save project ---------- */
   const saveProject = async () => {
+    if (isDemo) {
+      onUpdate({ ...project, name, description });
+      setEditing(false);
+      return;
+    }
+
     const res = await fetch(`${API_PROJECTS}/${project._id}`, {
       method: "PUT",
       headers: {
@@ -56,9 +60,23 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
     setEditing(false);
   };
 
-  /* ---------- Add task ---------- */
   const addTask = async () => {
     if (!taskName.trim()) return;
+
+    if (isDemo) {
+      const newTask = {
+        _id: Date.now().toString(),
+        name: taskName,
+        startDate,
+        endDate,
+      };
+      setTasks((prev) => [...prev, newTask]);
+      setTaskName("");
+      setStartDate("");
+      setEndDate("");
+      setShowAddTask(false);
+      return;
+    }
 
     const res = await fetch(`${API_PROJECTS}/${project._id}/tasks`, {
       method: "POST",
@@ -77,7 +95,6 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
     setShowAddTask(false);
   };
 
-  /* ---------- Start editing task ---------- */
   const startEditTask = (task) => {
     setEditingTaskId(task._id);
     setEditTaskName(task.name);
@@ -85,23 +102,36 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
     setEditEndDate(task.endDate?.slice(0, 10) || "");
   };
 
-  /* ---------- Save task edits ---------- */
   const saveTask = async (taskId) => {
-    const res = await fetch(
-      `${API_PROJECTS}/${project._id}/tasks/${taskId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: editTaskName,
-          startDate: editStartDate,
-          endDate: editEndDate,
-        }),
-      }
-    );
+    if (isDemo) {
+      setTasks((prev) =>
+        prev.map((t) =>
+          t._id === taskId
+            ? {
+                ...t,
+                name: editTaskName,
+                startDate: editStartDate,
+                endDate: editEndDate,
+              }
+            : t
+        )
+      );
+      setEditingTaskId(null);
+      return;
+    }
+
+    const res = await fetch(`${API_PROJECTS}/${project._id}/tasks/${taskId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        name: editTaskName,
+        startDate: editStartDate,
+        endDate: editEndDate,
+      }),
+    });
 
     const updatedTask = await res.json();
     setTasks((prev) =>
@@ -110,8 +140,12 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
     setEditingTaskId(null);
   };
 
-  /* ---------- Delete task ---------- */
   const deleteTask = async (taskId) => {
+    if (isDemo) {
+      setTasks((prev) => prev.filter((t) => t._id !== taskId));
+      return;
+    }
+
     await fetch(`${API_PROJECTS}/${project._id}/tasks/${taskId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
@@ -122,7 +156,10 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
 
   return (
     <div className="project-card">
-      {/* ---------- Project header ---------- */}
+      {isDemo && (
+        <div className="demo-warning">Demo Mode – Changes will not be saved</div>
+      )}
+
       {editing ? (
         <>
           <input value={name} onChange={(e) => setName(e.target.value)} />
@@ -140,166 +177,73 @@ export default function ProjectCard({ project, onDelete, onUpdate }) {
         </>
       )}
 
-      {/* ---------- Gantt chart ---------- */}
       {tasks.length > 0 && <GanttChart tasks={tasks} />}
 
- {/* ---------- Buttons section ---------- */}
-<div className="project-actions">
+      <div className="project-actions">
+        {!showAddTask ? (
+          <button className="btn-add" onClick={() => setShowAddTask(true)}>Add Task</button>
+        ) : (
+          <button className="cancel-btn" onClick={() => setShowAddTask(false)}>Cancel</button>
+        )}
 
-  {/* ---------- ADD TASK / CANCEL ---------- */}
-  {!showAddTask ? (
-    <button
-      className="btn-add"
-      onClick={() => setShowAddTask(true)}
-    >
-      Add Task
-    </button>
-  ) : (
-    <button
-      className="cancel-btn"
-      onClick={() => {
-        setShowAddTask(false);
-      }}
-    >
-      Cancel
-    </button>
-  )}
+        <button className="btn-delete" onClick={() => onDelete(project._id)}>Delete Project</button>
 
-  {/* ---------- DELETE PROJECT ---------- */}
-  <button
-    className="btn-delete"
-    onClick={() => onDelete(project._id)}
-  >
-    Delete Project
-  </button>
+        {tasks.length > 0 && (
+          <>
+            <button className="btn-edit-main" onClick={() => setEditing(true)}>Edit Project</button>
+            {!showTasks ? (
+              <button className="btn-tasks" onClick={() => setShowTasks(true)}>Tasks</button>
+            ) : (
+              <button className="cancel-btn-main" onClick={() => { setShowTasks(false); setEditingTaskId(null); }}>Cancel</button>
+            )}
+          </>
+        )}
+      </div>
 
-  {/* ---------- ONLY SHOW WHEN TASKS EXIST ---------- */}
-  {tasks.length > 0 && (
-    <>
-      {/* ---------- EDIT PROJECT ---------- */}
-      <button className = "btn-edit-main" onClick={() => setEditing(true)}>
-        Edit Project
-      </button>
-
-      {/* ---------- TASKS / CANCEL ---------- */}
-      {!showTasks ? (
-        <button
-          className="btn-tasks"
-          onClick={() => setShowTasks(true)}
-        >
-          Tasks
-        </button>
-      ) : (
-        <button
-          className="cancel-btn-main"
-          onClick={() => {
-            setShowTasks(false);
-            setEditingTaskId(null);
-          }}
-        >
-          Cancel
-        </button>
-      )}
-    </>
-  )}
-</div>
-
-
-      {/* ---------- Add Task Form ---------- */}
       {showAddTask && (
         <div className="task-form">
-          <input
-            placeholder="Task name"
-            value={taskName}
-            onChange={(e) => setTaskName(e.target.value)}
-          />
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-
+          <input placeholder="Task name" value={taskName} onChange={(e) => setTaskName(e.target.value)} />
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
           <div className="task-form-actions">
             <button onClick={addTask}>Add</button>
-            <button
-              className="cancel-btn"
-              onClick={() => {
-                setShowAddTask(false);
-                setTaskName("");
-                setStartDate("");
-                setEndDate("");
-              }}
-            >
-              Cancel
-            </button>
+            <button className="cancel-btn" onClick={() => {
+              setShowAddTask(false);
+              setTaskName("");
+              setStartDate("");
+              setEndDate("");
+            }}>Cancel</button>
           </div>
         </div>
       )}
 
-    {/* ---------- Task List ---------- */}
-{showTasks && tasks.length > 0 && (
-  <div className="task-list">
-    {tasks.map((task) => (
-      <div key={task._id} className="task-row">
-        {editingTaskId === task._id ? (
-          <>
-            {/* ---------- Inline Edit Inputs ---------- */}
-            <input
-              value={editTaskName}
-              onChange={(e) => setEditTaskName(e.target.value)}
-            />
-            <input
-              type="date"
-              value={editStartDate}
-              onChange={(e) => setEditStartDate(e.target.value)}
-            />
-            <input
-              type="date"
-              value={editEndDate}
-              onChange={(e) => setEditEndDate(e.target.value)}
-            />
-
-            {/* ---------- Save / Cancel Buttons ---------- */}
-            <div className="task-edit-actions">
-              <button
-                className="save-btn"
-                onClick={() => saveTask(task._id)}
-              >
-                Save
-              </button>
-              <button
-                className="cancel-btn"
-                onClick={() => setEditingTaskId(null)}
-              >
-                Cancel
-              </button>
+      {showTasks && tasks.length > 0 && (
+        <div className="task-list">
+          {tasks.map((task) => (
+            <div key={task._id} className="task-row">
+              {editingTaskId === task._id ? (
+                <>
+                  <input value={editTaskName} onChange={(e) => setEditTaskName(e.target.value)} />
+                  <input type="date" value={editStartDate} onChange={(e) => setEditStartDate(e.target.value)} />
+                  <input type="date" value={editEndDate} onChange={(e) => setEditEndDate(e.target.value)} />
+                  <div className="task-edit-actions">
+                    <button className="save-btn" onClick={() => saveTask(task._id)}>Save</button>
+                    <button className="cancel-btn" onClick={() => setEditingTaskId(null)}>Cancel</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <span>{task.name}</span>
+                  <div className="task-actions">
+                    <button onClick={() => startEditTask(task)}>Edit</button>
+                    <button onClick={() => deleteTask(task._id)} className="btn-delete">Delete</button>
+                  </div>
+                </>
+              )}
             </div>
-          </>
-        ) : (
-          <>
-            {/* ---------- Display Task ---------- */}
-            <span>{task.name}</span>
-            <div className="task-actions">
-              <button onClick={() => startEditTask(task)}>Edit</button>
-              <button
-                onClick={() => deleteTask(task._id)}
-                className="btn-delete"
-              >
-                Delete
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-    ))}
-  </div>
-)}
-
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,25 +1,50 @@
 import { useEffect, useState } from "react";
 import ProjectCard from "../components/ProjectCard";
+import { useNavigate } from "react-router-dom";
 import "./Projects.css";
 
-// ✅ Use VITE_ environment variables
 const API_PROJECTS = import.meta.env.VITE_API_PROJECTS;
 
-export default function Projects() {
+export default function Projects({ isDemo }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // ---------- Toggle Add Project ----------
   const [showAddProject, setShowAddProject] = useState(false);
   const [newName, setNewName] = useState("");
   const [newDescription, setNewDescription] = useState("");
 
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
-  /* ---------- FETCH PROJECTS ---------- */
   useEffect(() => {
     if (!token) return;
+
+    if (isDemo) {
+      setProjects([
+        {
+          _id: "demo-1",
+          name: "Website Redesign",
+          description: "Marketing site rebuild",
+          tasks: [
+            {
+              _id: "t1",
+              name: "Planning",
+              startDate: "2026-03-01",
+              endDate: "2026-03-05",
+            },
+            {
+              _id: "t2",
+              name: "Development",
+              startDate: "2026-03-06",
+              endDate: "2026-03-20",
+            },
+          ],
+        },
+      ]);
+      setLoading(false);
+      return;
+    }
 
     const fetchProjects = async () => {
       try {
@@ -38,11 +63,25 @@ export default function Projects() {
     };
 
     fetchProjects();
-  }, [token]);
+  }, [token, isDemo]);
 
-  /* ---------- ADD PROJECT ---------- */
   const addProject = async () => {
     if (!newName.trim()) return;
+
+    if (isDemo) {
+      const demoProject = {
+        _id: Date.now().toString(),
+        name: newName,
+        description: newDescription,
+        tasks: [],
+      };
+
+      setProjects((prev) => [demoProject, ...prev]);
+      setNewName("");
+      setNewDescription("");
+      setShowAddProject(false);
+      return;
+    }
 
     try {
       const res = await fetch(API_PROJECTS, {
@@ -68,8 +107,16 @@ export default function Projects() {
     }
   };
 
-  /* ---------- UPDATE PROJECT ---------- */
   const updateProject = async (updatedProject) => {
+    if (isDemo) {
+      setProjects((prev) =>
+        prev.map((p) =>
+          p._id === updatedProject._id ? updatedProject : p
+        )
+      );
+      return;
+    }
+
     try {
       const res = await fetch(`${API_PROJECTS}/${updatedProject._id}`, {
         method: "PUT",
@@ -93,8 +140,12 @@ export default function Projects() {
     }
   };
 
-  /* ---------- DELETE PROJECT ---------- */
   const deleteProject = async (id) => {
+    if (isDemo) {
+      setProjects((prev) => prev.filter((p) => p._id !== id));
+      return;
+    }
+
     try {
       const res = await fetch(`${API_PROJECTS}/${id}`, {
         method: "DELETE",
@@ -115,7 +166,13 @@ export default function Projects() {
       <h2>Your Projects</h2>
       {error && <p className="error">{error}</p>}
 
-      {/* ---------- Toggle Add Project ---------- */}
+      {isDemo && (
+        <div className="demo-banner">
+          Demo Mode – Your work will not be saved.
+          <button onClick={() => navigate("/register")}>Create Free Account</button>
+        </div>
+      )}
+
       <button
         className="add-project"
         onClick={() => setShowAddProject(!showAddProject)}
@@ -136,7 +193,6 @@ export default function Projects() {
             onChange={(e) => setNewDescription(e.target.value)}
           />
 
-          {/* ---------- ACTION BUTTONS ---------- */}
           <div className="add-project-actions">
             <button className="btn-add" onClick={addProject}>
               Add
@@ -156,7 +212,6 @@ export default function Projects() {
         </div>
       )}
 
-      {/* ---------- Project list ---------- */}
       {projects.length === 0 ? (
         <p>No projects yet.</p>
       ) : (
@@ -166,6 +221,7 @@ export default function Projects() {
             project={project}
             onDelete={deleteProject}
             onUpdate={updateProject}
+            isDemo={isDemo}
           />
         ))
       )}

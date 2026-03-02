@@ -8,22 +8,40 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 
 function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [isDemo, setIsDemo] = useState(
+    () => localStorage.getItem("isDemo") === "true"
+  );
 
   const handleLoginSuccess = (newToken) => {
     localStorage.setItem("token", newToken);
-    setToken(newToken); // 🔥 forces re-render immediately
+
+    if (newToken === "demo-user") {
+      localStorage.setItem("isDemo", "true");
+      setIsDemo(true);
+    } else {
+      localStorage.removeItem("isDemo");
+      setIsDemo(false);
+    }
+
+    setToken(newToken);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("isDemo");
     setToken(null);
+    setIsDemo(false);
   };
 
   return (
     <BrowserRouter>
-      {/* 🔐 Logout button */}
       {token && (
         <div style={{ padding: "10px", textAlign: "right" }}>
+          {isDemo && (
+            <span style={{ marginRight: "15px", fontWeight: "bold" }}>
+              Demo Mode
+            </span>
+          )}
           <button
             onClick={handleLogout}
             style={{
@@ -61,7 +79,7 @@ function App() {
           path="/projects"
           element={
             <ProtectedRoute>
-              <Projects token={token} />
+              <Projects token={token} isDemo={isDemo} />
             </ProtectedRoute>
           }
         />
